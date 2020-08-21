@@ -9,7 +9,9 @@ const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
-const { isNumber } = require("util");
+const util = require("util");
+
+const writeFileAsync = util.promisify(fs.writeFile)
 
 let team = [];
 
@@ -28,7 +30,7 @@ const questions = [
         name: "id",
         validate: function (value) {
             let valid = Number.isInteger(value);
-            return valid || 'Please enter a number (just hit ctrl + C to exit).';
+            return valid || 'Please enter a number (hit up first then try again).';
         },
         filter: Number
     },
@@ -108,64 +110,68 @@ const questionsManager = [
 ];
 
 
-function ask() {
-    inquirer
-    .prompt(questions).then(function(data) {
-        if(data.type == "Engineer") {
-            inquirer
-                .prompt(questionsEngineer).then(function(response) {
-                    const engineer = new Engineer(data.name, data.id, data.email, response.github)
-                    team.push(engineer);
-                    if (response.askAgain) {
-                        ask();
-                    } else {
-                        fs.writeFile(outputPath, render(team), function() {
-                            console.log("Successfully wrote HTML!")
-                        })
-                    }
-                })
-        } else if (data.type == "Intern") {
-            inquirer
-                .prompt(questionsIntern).then(function(response) {
-                    const intern = new Intern(data.name, data.id, data.email, response.school)
-                    team.push(intern);
-                    if (response.askAgain) {
-                        ask();
-                    } else {
-                        fs.writeFile(outputPath, render(team), function() {
-                            console.log("Successfully wrote HTML!")
-                        })
-                    }
-                })
-        } else if (data.type == "Manager") {
-            inquirer
-                .prompt(questionsManager).then(function(response) {
-                    const manager = new Manager(data.name, data.id, data.email, response.officeNumber)
-                    team.push(manager);
-                    if (response.askAgain) {
-                        ask();
-                    } else {
-                        fs.writeFile(outputPath, render(team), function() {
-                            console.log("Successfully wrote HTML!")
-                        })
-                    }
-                })
-        }
-    })
+async function ask() {
+    try {
+        const data = await inquirer.prompt(questions)
+
+            if(data.type == "Engineer") {
+                await inquirer
+                    .prompt(questionsEngineer).then(function(response) {
+                        const engineer = new Engineer(data.name, data.id, data.email, response.github)
+                        team.push(engineer);
+                        if (response.askAgain) {
+                            ask();
+                        } else {
+                            // fs.writeFile(outputPath, render(team), function() {
+                            //     console.log("Successfully wrote HTML!")
+                            // })
+                        }
+                    })
+            } else if (data.type == "Intern") {
+                await inquirer
+                    .prompt(questionsIntern).then(function(response) {
+                        const intern = new Intern(data.name, data.id, data.email, response.school)
+                        team.push(intern);
+                        if (response.askAgain) {
+                            ask();
+                        } else {
+                            // fs.writeFile(outputPath, render(team), function() {
+                            //     console.log("Successfully wrote HTML!")
+                            // })
+                        }
+                    })
+            } else if (data.type == "Manager") {
+                await inquirer
+                    .prompt(questionsManager).then(function(response) {
+                        const manager = new Manager(data.name, data.id, data.email, response.officeNumber)
+                        team.push(manager);
+                        if (response.askAgain) {
+                            ask();
+                        } else {
+                            // fs.writeFile(outputPath, render(team), function() {
+                            //     console.log("Successfully wrote HTML!")
+                            // })
+                        }
+                    })
+            }
+    } catch(err) {
+
+    }
+    
 }
 
-ask();
+// ask();
 
-// async function asyncRun() {
-//     try {
-//         await ask();
-//         await fs.writeFile(outputPath, render(output)).then(() => console.log("Success!"))
-//     }
-//     catch(error) {
-//         console.log(error);
-//     }
-// }
-// asyncRun();
+async function asyncRun() {
+    try {
+        await ask();
+        await writeFileAsync(outputPath, render(team)).then(() => console.log("Success!"))
+    }
+    catch(error) {
+        console.log(error);
+    }
+}
+asyncRun();
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
