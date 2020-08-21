@@ -10,6 +10,78 @@ const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
 
+let output = [];
+
+inquirer
+    .prompt([
+        {
+            type: "input",
+            message: "Employee Name:",
+            name: "name"
+        },
+        {
+            type: "input",
+            message: "Employee ID:",
+            name: "id"
+        },
+        {
+            type: "input",
+            message: "Employee Email:",
+            name: "email"
+        },
+        {
+            type: "list",
+            message: "Employee Type:",
+            name: "type",
+            choices: [
+                "Engineer",
+                "Intern",
+                "Manager"
+            ]
+        }
+    ]).then(function(data) {
+        if(data.type == "Engineer") {
+            inquirer
+                    .prompt([
+                        {
+                            type: "input",
+                            message: "GitHub Username:",
+                            name: "github"
+                        }
+                    ]).then(function(response) {
+                        const engineer = new Engineer(data.name, data.id, data.email, response.github)
+                        output.push(engineer);
+                        console.log(output);
+                    })
+        } else if (data.type == "Intern") {
+            inquirer
+                .prompt([
+                    {
+                        type: "input",
+                        message: "School:",
+                        name: "school"
+                    }
+                ]).then(function(response) {
+                    const intern = new Intern(data.name, data.id, data.email, response.school)
+                    output.push(intern);
+                    console.log(output);
+                })
+        } else if (data.type == "Manager") {
+            inquirer
+                .prompt([
+                    {
+                        type: "input",
+                        message: "Office Number:",
+                        name: "officeNumber"
+                    }
+                ]).then(function(response) {
+                    const manager = new Manager(data.name, data.id, data.email, response.officeNumber)
+                    output.push(manager);
+                    console.log(output);
+                })
+        }
+    })
+
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
