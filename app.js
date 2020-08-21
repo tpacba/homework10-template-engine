@@ -30,7 +30,7 @@ const questions = [
         name: "id",
         validate: function (value) {
             let valid = Number.isInteger(value);
-            return valid || 'Please enter a number (hit up first then try again).';
+            return valid || 'Please enter a number (hit up first then delete to try again).';
         },
         filter: Number
     },
@@ -97,7 +97,7 @@ const questionsManager = [
         name: "officeNumber",
         validate: function (value) {
             let valid = Number.isInteger(value);
-            return valid || 'Please enter a number (just hit ctrl + C to exit).';
+            return valid || 'Please enter a number (hit up first then delete to try again).';
         },
         filter: Number
     },
