@@ -12,7 +12,8 @@ const render = require("./lib/htmlRenderer");
 
 let output = [];
 
-inquirer
+function ask() {
+    inquirer
     .prompt([
         {
             type: "input",
@@ -47,11 +48,21 @@ inquirer
                             type: "input",
                             message: "GitHub Username:",
                             name: "github"
+                        },
+                        {
+                            type: "confirm",
+                            message: "Would you like to input another employee (just hit enter for YES)?",
+                            name: "askAgain",
+                            default: true,
                         }
                     ]).then(function(response) {
                         const engineer = new Engineer(data.name, data.id, data.email, response.github)
                         output.push(engineer);
-                        console.log(output);
+                        if (response.askAgain) {
+                            ask();
+                        } else {
+                            console.log(output);
+                        }
                     })
         } else if (data.type == "Intern") {
             inquirer
@@ -60,11 +71,21 @@ inquirer
                         type: "input",
                         message: "School:",
                         name: "school"
+                    },
+                    {
+                        type: "confirm",
+                        message: "Would you like to input another employee (just hit enter for YES)?",
+                        name: "askAgain",
+                        default: true,
                     }
                 ]).then(function(response) {
                     const intern = new Intern(data.name, data.id, data.email, response.school)
                     output.push(intern);
-                    console.log(output);
+                    if (response.askAgain) {
+                        ask();
+                    } else {
+                        console.log(output);
+                    }
                 })
         } else if (data.type == "Manager") {
             inquirer
@@ -73,14 +94,27 @@ inquirer
                         type: "input",
                         message: "Office Number:",
                         name: "officeNumber"
+                    },
+                    {
+                        type: "confirm",
+                        message: "Would you like to input another employee (just hit enter for YES)?",
+                        name: "askAgain",
+                        default: true,
                     }
                 ]).then(function(response) {
                     const manager = new Manager(data.name, data.id, data.email, response.officeNumber)
                     output.push(manager);
-                    console.log(output);
+                    if (response.askAgain) {
+                        ask();
+                    } else {
+                        console.log(output);
+                    }
                 })
         }
     })
+}
+
+ask();
 
 
 // Write code to use inquirer to gather information about the development team members,
