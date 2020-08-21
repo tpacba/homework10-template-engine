@@ -4,6 +4,7 @@ const Intern = require("./lib/Intern");
 const inquirer = require("inquirer");
 const path = require("path");
 const fs = require("fs");
+const util = require("util")
 
 const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
@@ -51,7 +52,7 @@ function ask() {
                         },
                         {
                             type: "confirm",
-                            message: "Would you like to input another employee (just hit enter for YES)?",
+                            message: "Would you like to add another employee (just hit enter for YES)?",
                             name: "askAgain",
                             default: true,
                         }
@@ -61,7 +62,9 @@ function ask() {
                         if (response.askAgain) {
                             ask();
                         } else {
-                            console.log(output);
+                            fs.writeFile(outputPath, render(output), function() {
+                                console.log("Successfully wrote HTML!")
+                            })
                         }
                     })
         } else if (data.type == "Intern") {
@@ -84,7 +87,9 @@ function ask() {
                     if (response.askAgain) {
                         ask();
                     } else {
-                        console.log(output);
+                        fs.writeFile(outputPath, render(output), function() {
+                            console.log("Successfully wrote HTML!")
+                        })
                     }
                 })
         } else if (data.type == "Manager") {
@@ -107,7 +112,9 @@ function ask() {
                     if (response.askAgain) {
                         ask();
                     } else {
-                        console.log(output);
+                        fs.writeFile(outputPath, render(output), function() {
+                            console.log("Successfully wrote HTML!")
+                        })
                     }
                 })
         }
@@ -116,6 +123,17 @@ function ask() {
 
 ask();
 
+// const writeFileAsync = util.promisify(fs.writeFile);
+// async function run() {
+//     try {
+//         ask();
+//         await writeFileAsync(outputPath, render(output)).then(() => console.log("Success!"))
+//     }
+//     catch(error) {
+//         console.log(error);
+//     }
+// }
+// run();
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
