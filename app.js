@@ -4,115 +4,148 @@ const Intern = require("./lib/Intern");
 const inquirer = require("inquirer");
 const path = require("path");
 const fs = require("fs");
-const util = require("util")
 
 const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
 
 const render = require("./lib/htmlRenderer");
+const { isNumber } = require("util");
 
-let output = [];
+let team = [];
+
+const questions = [
+    {
+        type: "input",
+        message: "Employee Name:",
+        name: "name",
+        filter: function (value) {
+            return value.toUpperCase();
+        }
+    },
+    {
+        type: "input",
+        message: "Employee ID:",
+        name: "id",
+        validate: function (value) {
+            let valid = Number.isInteger(value);
+            return valid || 'Please enter a number (just hit ctrl + C to exit).';
+        },
+        filter: Number
+    },
+    {
+        type: "input",
+        message: "Employee Email:",
+        name: "email",
+        validate: function (value) {
+            let regex = /@/;
+            let valid = regex.test(value);
+            return valid || 'Please enter a valid email.';
+        }
+    },
+    {
+        type: "list",
+        message: "Employee Type:",
+        name: "type",
+        choices: [
+            "Engineer",
+            "Intern",
+            "Manager"
+        ]
+    }
+];
+
+const questionsEngineer = [
+    {
+        type: "input",
+        message: "GitHub Username:",
+        name: "github",
+        filter: function (value) {
+            return value.toLowerCase();
+        }
+    },
+    {
+        type: "confirm",
+        message: "Would you like to add another employee (just hit enter for YES)?",
+        name: "askAgain",
+        default: true,
+    }
+];
+
+const questionsIntern = [
+    {
+        type: "input",
+        message: "School:",
+        name: "school",
+        filter: function (value) {
+            return value.toUpperCase();
+        }
+    },
+    {
+        type: "confirm",
+        message: "Would you like to input another employee (just hit enter for YES)?",
+        name: "askAgain",
+        default: true,
+    }
+];
+
+const questionsManager = [
+    {
+        type: "input",
+        message: "Office Number:",
+        name: "officeNumber",
+        validate: function (value) {
+            let valid = Number.isInteger(value);
+            return valid || 'Please enter a number (just hit ctrl + C to exit).';
+        },
+        filter: Number
+    },
+    {
+        type: "confirm",
+        message: "Would you like to input another employee (just hit enter for YES)?",
+        name: "askAgain",
+        default: true,
+    }
+];
+
 
 function ask() {
     inquirer
-    .prompt([
-        {
-            type: "input",
-            message: "Employee Name:",
-            name: "name"
-        },
-        {
-            type: "input",
-            message: "Employee ID:",
-            name: "id"
-        },
-        {
-            type: "input",
-            message: "Employee Email:",
-            name: "email"
-        },
-        {
-            type: "list",
-            message: "Employee Type:",
-            name: "type",
-            choices: [
-                "Engineer",
-                "Intern",
-                "Manager"
-            ]
-        }
-    ]).then(function(data) {
+    .prompt(questions).then(function(data) {
         if(data.type == "Engineer") {
             inquirer
-                    .prompt([
-                        {
-                            type: "input",
-                            message: "GitHub Username:",
-                            name: "github"
-                        },
-                        {
-                            type: "confirm",
-                            message: "Would you like to add another employee (just hit enter for YES)?",
-                            name: "askAgain",
-                            default: true,
-                        }
-                    ]).then(function(response) {
-                        const engineer = new Engineer(data.name, data.id, data.email, response.github)
-                        output.push(engineer);
-                        if (response.askAgain) {
-                            ask();
-                        } else {
-                            fs.writeFile(outputPath, render(output), function() {
-                                console.log("Successfully wrote HTML!")
-                            })
-                        }
-                    })
-        } else if (data.type == "Intern") {
-            inquirer
-                .prompt([
-                    {
-                        type: "input",
-                        message: "School:",
-                        name: "school"
-                    },
-                    {
-                        type: "confirm",
-                        message: "Would you like to input another employee (just hit enter for YES)?",
-                        name: "askAgain",
-                        default: true,
-                    }
-                ]).then(function(response) {
-                    const intern = new Intern(data.name, data.id, data.email, response.school)
-                    output.push(intern);
+                .prompt(questionsEngineer).then(function(response) {
+                    const engineer = new Engineer(data.name, data.id, data.email, response.github)
+                    team.push(engineer);
                     if (response.askAgain) {
                         ask();
                     } else {
-                        fs.writeFile(outputPath, render(output), function() {
+                        fs.writeFile(outputPath, render(team), function() {
+                            console.log("Successfully wrote HTML!")
+                        })
+                    }
+                })
+        } else if (data.type == "Intern") {
+            inquirer
+                .prompt(questionsIntern).then(function(response) {
+                    const intern = new Intern(data.name, data.id, data.email, response.school)
+                    team.push(intern);
+                    if (response.askAgain) {
+                        ask();
+                    } else {
+                        fs.writeFile(outputPath, render(team), function() {
                             console.log("Successfully wrote HTML!")
                         })
                     }
                 })
         } else if (data.type == "Manager") {
             inquirer
-                .prompt([
-                    {
-                        type: "input",
-                        message: "Office Number:",
-                        name: "officeNumber"
-                    },
-                    {
-                        type: "confirm",
-                        message: "Would you like to input another employee (just hit enter for YES)?",
-                        name: "askAgain",
-                        default: true,
-                    }
-                ]).then(function(response) {
+                .prompt(questionsManager).then(function(response) {
                     const manager = new Manager(data.name, data.id, data.email, response.officeNumber)
-                    output.push(manager);
+                    team.push(manager);
                     if (response.askAgain) {
                         ask();
                     } else {
-                        fs.writeFile(outputPath, render(output), function() {
+                        fs.writeFile(outputPath, render(team), function() {
                             console.log("Successfully wrote HTML!")
                         })
                     }
@@ -123,17 +156,16 @@ function ask() {
 
 ask();
 
-// const writeFileAsync = util.promisify(fs.writeFile);
-// async function run() {
+// async function asyncRun() {
 //     try {
-//         ask();
-//         await writeFileAsync(outputPath, render(output)).then(() => console.log("Success!"))
+//         await ask();
+//         await fs.writeFile(outputPath, render(output)).then(() => console.log("Success!"))
 //     }
 //     catch(error) {
 //         console.log(error);
 //     }
 // }
-// run();
+// asyncRun();
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
