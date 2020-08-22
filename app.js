@@ -121,10 +121,6 @@ async function ask() {
                         team.push(engineer);
                         if (response.askAgain) {
                             ask();
-                        } else {
-                            // fs.writeFile(outputPath, render(team), function() {
-                            //     console.log("Successfully wrote HTML!")
-                            // })
                         }
                     })
             } else if (data.type == "Intern") {
@@ -134,10 +130,6 @@ async function ask() {
                         team.push(intern);
                         if (response.askAgain) {
                             ask();
-                        } else {
-                            // fs.writeFile(outputPath, render(team), function() {
-                            //     console.log("Successfully wrote HTML!")
-                            // })
                         }
                     })
             } else if (data.type == "Manager") {
@@ -147,10 +139,6 @@ async function ask() {
                         team.push(manager);
                         if (response.askAgain) {
                             ask();
-                        } else {
-                            // fs.writeFile(outputPath, render(team), function() {
-                            //     console.log("Successfully wrote HTML!")
-                            // })
                         }
                     })
             }
@@ -159,8 +147,6 @@ async function ask() {
     }
     
 }
-
-// ask();
 
 async function asyncRun() {
     try {
