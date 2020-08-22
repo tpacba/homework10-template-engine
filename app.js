@@ -117,6 +117,7 @@ async function ask() {
             if(data.type == "Engineer") {
                 await inquirer
                     .prompt(questionsEngineer).then(function(response) {
+                        console.log(response)
                         const engineer = new Engineer(data.name, data.id, data.email, response.github)
                         team.push(engineer);
                         if (response.askAgain) {
